@@ -1,25 +1,50 @@
-# today
+# `today`
 
 Set exit status according to a set of conditions for today
 
+## Usage
+
 ```
-Usage: dtfilter [OPTIONS] [ISO-8601]
-  Options are:
-    -1, --1st, --first ........ DAY is in 1st WEEK
-    -2, --2nd, --second ....... DAY is in 2nd WEEK
-    -3, --3rd, --third ........ DAY is in 3rd WEEK
-    -4, --4th, --fourth ....... DAY is in 4th WEEK
-    -5, --5th, --fifth ........ DAY is in 5th WEEK
-    -l, --last ................ Last occurance of DAY in MONTH
-    -o, --odd ................. WEEK is ODD
-    -e, --even ................ WEEK is even
-    --monday, ..., --sunday ... DAY is Monday, Tuesday, ..., Sunday
-    --utc ..................... Use UTC rather than local time
-    --verbose ................. Print error message in case of failure
-  or:
-    -h,  --help ............... show this help text and exit
-    -v,  --version ............ print version information and exit
-    -c,  --copyright .......... show copying policy and exit
+Usage: today [OPTIONS] CONDITION [CONDITION …]
+
+positional arguments:
+  CONDITION        please see epilog
+
+optional arguments:
+  -h, --help       show this help message and exit
+  -v, --version    show version information and exit
+  -c, --copyright  show copying policy and exit
+  -u, -z, --utc    use UTC rather than local time
+  -q, --quiet      don't say a thing unless it's an error
+
+This program tests if a set of conditions is true for today,
+and exits accordingly.
+
+Conditions include:
+  · weekday
+  · occurance of weekday
+
+E.g.:
+  · today is monday
+  · today is the last tuesday
+  · today is a wednesday or a thursday
+  · today is a friday, a saturday, or a sunday.
+  · today is the second or the fourth thursday
+
+Weekdays can be abbreviated to their first three letters:
+Mon, Tue, Wed, Thu, Fri, Sat, Sun.
+
+Ordinals can be abbreviated to 1st, 2nd, 3rd, 4th, or 5th,
+or even just 1, 2, 3, 4, or 5.
 ```
+
+## Requirements
+
+* Python 3.4+
+
+## Repositories
+
+* https://github.com/kseistrup/today.git
+* ssb://%c99bvbt69xJrWtxdYMph0Pa6Z2bYMGwBSk2edtmgavo=.sha256
 
 :smile:
