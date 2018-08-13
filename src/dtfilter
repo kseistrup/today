@@ -1,0 +1,339 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Usage: dtfilter [OPTIONS] [ISO-8601]
+  Options are:
+    -1, --1st, --first ........ DAY is in 1st WEEK
+    -2, --2nd, --second ....... DAY is in 2nd WEEK
+    -3, --3rd, --third ........ DAY is in 3rd WEEK
+    -4, --4th, --fourth ....... DAY is in 4th WEEK
+    -5, --5th, --fifth ........ DAY is in 5th WEEK
+    -l, --last ................ Last occurance of DAY in MONTH
+    -o, --odd ................. WEEK is ODD
+    -e, --even ................ WEEK is even
+    --monday, ..., --sunday ... DAY is Monday, Tuesday, ..., Sunday
+    --utc ..................... Use UTC rather than local time
+    --verbose ................. Print error message in case of failure
+  or:
+    -h,  --help ............... show this help text and exit
+    -v,  --version ............ print version information and exit
+    -c,  --copyright .......... show copying policy and exit
+"""
+##############################################################################
+# This program is free software; you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by the Free #
+# Software Foundation; either version 3 of the License, or (at your option)  #
+# any later version.                                                         #
+#                                                                            #
+# This program is distributed in the hope that it will be useful, but with-  #
+# out any warranty; without even the implied warranty of merchantability or  #
+# fitness for a particular purpose.  See the GNU General Public License for  #
+# more details.  <http://gplv3.fsf.org/>                                     #
+##############################################################################
+
+__version__     = '0.1.2'
+__revision__    = '2011-01-01'
+__author__      = 'Klaus Alexander Seistrup <kas+dtfilter@magnetic-ink.dk>'
+
+__copyright__   = """dtfilter %s (%s)
+Copyright © 2010,2011 Klaus Alexander Seistrup <klaus@seistrup.dk>
+
+This is free software; see the source for copying conditions.  There is no
+warranty; not even for merchantability or fitness for a particular purpose.""" % (
+    __version__, __revision__
+)
+
+import sys
+import os
+import getopt
+import datetime
+
+from sys import stdin, stdout, stderr
+
+ME = 'dtfilter'
+
+class MyError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+    # end def __init__
+# end class MyError
+
+Options = {
+    # specific options
+    'f' : 'first',
+    '1' : '1st',
+    '2' : '2nd',
+    '3' : '3rd',
+    '4' : '4th',
+    '5' : '5th',
+    'l' : 'last',
+    'o' : 'odd',
+    'e' : 'even',
+    'u' : 'utc',
+    # Generic options
+    'c' : 'copyright',
+    'h' : 'help',
+    'v' : 'version',
+}
+sopts = ''.join(Options.keys())
+dopts = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+wopts = ['second', 'third', 'fourth', 'fifth']
+xopts = ['verbose', 'copyleft', 'copying-policy']
+lopts = Options.values() + dopts + wopts + xopts
+
+def parse(args):
+    try:
+        import isodate
+    except ImportError, err:
+        print >>stderr, str(err) + '.'
+        sys.exit(1)
+    # end try
+    nargs = len(args)
+    if nargs == 1:
+        # Assume we have a date only
+        date = args[0]
+        parser = isodate.parse_date
+    elif nargs == 2:
+        # Assume they gave us a time, too
+        date = 'T'.join(args)
+        parser = isodate.parse_datetime
+    else:
+        # Perhaps we should just ignore this…
+        date = ' '.join(args)
+        parser = isodate.parse_datetime
+    # end if
+    try:
+        dt = parser(date)
+    except isodate.isoerror.ISO8601Error, err:
+        print >>stderr, str(err)
+        sys.exit(1)
+    except ValueError, err:
+        print >>stderr, str(err).capitalize()
+        sys.exit(1)
+    # end try
+    return dt
+# end def parse
+
+#
+def die(rc, verbose, msg=None):
+    if verbose:
+        if msg is not None:
+            print msg
+        # end if
+    # end if
+    sys.exit(int(rc))
+# end if
+
+# Date ordinalization
+stndrdth = lambda n: {
+     1: 'st',
+     2: 'nd',
+     3: 'rd',
+    21: 'st',
+    22: 'nd',
+    23: 'rd',
+    31: 'st',
+}.get(n, 'th')
+
+# datetime → NNth Month Year
+def dmy(dt):
+    (year, month, day) = dt.timetuple()[:3]
+    return '%d%s %s %d' % (day, stndrdth(day), dt.strftime('%B'), year)
+# end def dmy
+
+# Main entry point
+def main(argv=None):
+    global ME, stderr
+
+    if argv is None:
+        argv = sys.argv
+    # end if
+
+    me = os.path.basename(argv[0])
+    while me[-3:] == '.py':
+        me = me[:-3]
+    # end while
+    ME = me
+
+    try:
+        try:
+            (opts, args) = getopt.getopt(argv[1:], sopts, lopts)
+        except getopt.error, msg:
+            raise MyError(msg)
+        # end try
+    except MyError, err:
+        print >>stderr, str(err.msg).capitalize() + '.'
+        print >>stderr, "Try '%s --help' for more information." % (me,)
+        return 1
+    # end try
+
+    theDay = \
+    theWeek = \
+    isOdd = \
+    isEven = None
+
+    VERBOSE = UTC = False
+
+    # Loop through options
+    for (opt, arg) in opts:
+        # Specific options
+        if   opt in ('--monday', '--tuesday', '--wednesday', '--thursday', '--friday', '--saturday', '--sunday'):
+            theDay = {
+                'mon': 1,
+                'tue': 2,
+                'wed': 3,
+                'thu': 4,
+                'fri': 5,
+                'sat': 6,
+                'sun': 7,
+            }.get(opt[2:5], -1)
+        elif opt in ('-1', '--1st', '--first', '-f'):
+            theWeek = 1
+        elif opt in ('-2', '--2nd', '--second'):
+            theWeek = 2
+        elif opt in ('-3', '--3rd', '--third'):
+            theWeek = 3
+        elif opt in ('-4', '--4th', '--fourth'):
+            theWeek = 4
+        elif opt in ('-5', '--5th', '--fifth'):
+            theWeek = 5
+        elif opt in ('-l', '--last'):
+            theWeek = 0
+        elif opt in ('-o', '--odd'):
+            isOdd = True
+        elif opt in ('-e', '--even'):
+            isEven = True
+        elif opt in ('-u', '--utc'):
+            UTC = True
+        elif opt in ('--verbose',):
+            VERBOSE = True
+        # Generic options
+        elif opt in ('-h', '--help'):
+            print __doc__
+            return 0
+        elif opt in ('-c', '--copyright', '--copyleft', '--copying-policy'):
+            print __copyright__
+            return 0
+        elif opt in ('-v', '--version'):
+            if me != 'dtfilter':
+                print 'dtfilter/%s %s' % (__version__, me)
+            else:
+                print 'dtfilter/%s' % (__version__,)
+            # end if
+            return 0
+        else:
+            print >>stderr, "Try '%s --help' for more information." % (me,)
+            return 1
+        # end if
+    # end for
+
+    try:
+        assert theDay is None or 1 <= theDay <= 7, 'Internal error (theday): %s' % str(theDay)
+        assert theWeek is None or 0 <= theWeek <= 5, 'Internal error (theWeek): %s' % str(theWeek)
+        assert isOdd in (None, True, False), 'Internal error (isOdd)'
+        assert isEven in (None, True, False), 'Internal error (isEven)'
+    except AssertionError, err:
+        print >>stderr, str(err)
+        return -1
+    # end try
+
+    if len(args) >= 1:
+        if UTC:
+            print >>stderr, 'Warning: UTC switch ignored'
+        # end if
+        now = parse(args)
+    elif UTC:
+        now = datetime.datetime.utcnow()
+    else:
+        now = datetime.datetime.now()
+    # end if
+
+    (year, week,  dow) = now.isocalendar()
+    (year, month, day) = now.timetuple()[:3]
+
+    DAYS = (
+        'No', # This index is 1-based
+        'Mon', 'Tues', 'Wednes', 'Thurs', 'Fri', 'Satur', 'Sun'
+    )
+
+    if theDay is not None:
+        result = theDay == dow
+        if not result:
+            msg = '%s is a %sday, not a %sday.' % (
+                dmy(now), DAYS[dow], DAYS[theDay]
+            )
+            die(1, VERBOSE, msg)
+        # end if
+    # end if
+
+    if isOdd is not None:
+        result = week & 1 == 1
+        if not result:
+            die(1, VERBOSE, 'Week %d, %04d, is even, not odd.' % (week, year))
+        # end if
+    # end if
+
+    if isEven is not None:
+        result = week & 1 == 0
+        if not result:
+            die(1,  VERBOSE, 'Week %d, %04d, is odd, not even.' % (week, year))
+    # end if
+
+    if theWeek is None:
+        die(0, VERBOSE)
+    # end if
+
+    WEEKS = (
+        (-1, -1), # This index is 1-based
+        ( 1,  7), ( 8, 14), (15, 21), (22, 28), (29, 31)
+    )
+    if 1 <= theWeek <= 5:
+        (theMin, theMax) = WEEKS[theWeek]
+        result = theMin <= day <= theMax
+        if not result:
+            msg = '%s is not the %d%s %sday in %s %s.' % (
+                dmy(now),
+                theWeek, stndrdth(theWeek), DAYS[dow],
+                now.strftime('%B'), year
+            )
+        else:
+            msg = None
+        # end if
+        die(not result, VERBOSE, msg)
+    # end if
+
+    # We only need this in februaries, but let's do it in all months.
+    leap = int(year % 4 == 0 and (year % 100 != 0 or year % 400 == 0))
+    mdays = (
+         0, # This index is 1-based
+        31, 28+leap, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+    )
+    theMax = mdays[month]
+    theMin = theMax-7
+
+    result = theMin < day <= theMax
+    if not result:
+        msg = '%s is not the last %sday in %s %s.' % (
+            dmy(now),
+            DAYS[dow],
+            now.strftime('%B'), year
+        )
+    else:
+        msg = None
+    # end if
+    die(not result, VERBOSE, msg)
+
+    return -1
+# end def main
+
+if __name__ == '__main__':
+    try:
+        from locale import setlocale, LC_ALL
+        dummy = setlocale(LC_ALL, '')
+    except:
+        pass
+    # end try
+    sys.exit(main(sys.argv))
+# end if
+
+# eof
