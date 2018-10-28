@@ -67,8 +67,8 @@ if sys.version_info < (3, 4):
 
 __author__ = 'Klaus Alexander Seistrup <klaus@seistrup.dk>'
 __whoami__ = 'today'
-__revision__ = '2018-08-12'
-__version__ = '0.2.0 ({})'.format(__revision__)
+__revision__ = '2018-10-28'
+__version__ = '0.2.1 ({})'.format(__revision__)
 __copyright__ = """\
 today {}
 Copyright © 2010-18 Klaus Alexander Seistrup <klaus@seistrup.dk>
@@ -113,7 +113,7 @@ WEEKDAYS = (
     'Sunday'
 )
 
-DOW_LIST = [_dow[:3].upper() for _dow in WEEKDAYS]
+DOW_LIST = [_dow[:3].casefold() for _dow in WEEKDAYS]
 DOW_BITS = {_val: 1 << _key for (_key, _val) in enumerate(DOW_LIST)}
 DOW_SET = set(DOW_LIST)
 DOW_SET.discard('\0')
@@ -129,21 +129,21 @@ ORDINALS = (
 )
 ORDS = (
     '\0',  # This index in 1-based
-    '1ST',
-    '2ND',
-    '3RD',
-    '4TH',
-    '5TH'
+    '1st',
+    '2nd',
+    '3rd',
+    '4th',
+    '5th'
 )
 ORD_DICT = {
-    _val[:3].upper(): _key for (_key, _val) in enumerate(ORDINALS)
+    _val[:3].casefold(): _key for (_key, _val) in enumerate(ORDINALS)
 }
 SUGAR = {
-    _val[:3].upper(): _key for (_key, _val) in enumerate(ORDS)
+    _val[:3].casefold(): _key for (_key, _val) in enumerate(ORDS)
 }
 ORD_DICT.update(SUGAR)
 SUGAR = {
-    _val[:3].upper(): _key for (_key, _val) in enumerate('\012345')
+    _val[:3].casefold(): _key for (_key, _val) in enumerate('\012345')
 }
 ORD_DICT.update(SUGAR)
 ORD_SET = set(ORD_DICT.keys())
@@ -154,7 +154,7 @@ WEEKS = (
     (1, 7), (8, 14), (15, 21), (22, 28), (29, 31)
 )
 
-IGNORE = {'A', 'IS', 'NO', 'NUM', 'OCC', 'OF', 'OR', 'THE'}
+IGNORE = {'a', 'is', 'no', 'num', 'occ', 'of', 'or', 'the'}
 
 
 def debug(head, data=None):
@@ -264,7 +264,7 @@ def today(exprs, utc=False, verbose=False):
     windex = None
 
     for word in exprs:
-        abbr = word[:3].upper()
+        abbr = word[:3].casefold()
         if abbr in IGNORE:
             continue
         if abbr in DOW_SET:
