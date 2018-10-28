@@ -55,12 +55,6 @@ import string
 
 from pprint import pprint
 
-try:
-    from locale import (Error, setlocale, LC_ALL)
-    _ = setlocale(LC_ALL, '')
-except (ImportError, ModuleNotFoundError, NameError, Error):
-    pass
-
 if sys.version_info < (3, 4):
     print('Python 3.4+ required.', file=sys.stderr)
     sys.exit(1)
