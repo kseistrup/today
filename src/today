@@ -61,7 +61,7 @@ if sys.version_info < (3, 4):
 
 __author__ = 'Klaus Alexander Seistrup <klaus@seistrup.dk>'
 __whoami__ = 'today'
-__revision__ = '3'
+__revision__ = '5'
 __version__ = '2018.10.28-{rev}'.format(rev=__revision__)
 __copyright__ = """\
 today {ver}
@@ -107,7 +107,13 @@ WEEKDAYS = (
     'Sunday'
 )
 
-DOW_LIST = [_dow[:3].casefold() for _dow in WEEKDAYS]
+
+def keyword(word):
+    """Make a case-insensitive abbreviation of WORD"""
+    return word[:3].casefold()
+
+
+DOW_LIST = [keyword(_dow) for _dow in WEEKDAYS]
 DOW_BITS = {_val: 1 << _key for (_key, _val) in enumerate(DOW_LIST)}
 DOW_SET = set(DOW_LIST)
 DOW_SET.discard('\0')
@@ -129,13 +135,6 @@ ORDS = (
     '4th',
     '5th'
 )
-
-
-def keyword(word):
-    """Make a case-insensitive abbreviation of WORD"""
-    return word[:3].casefold()
-
-
 ORD_DICT = {
     keyword(_val): _key for (_key, _val) in enumerate(ORDINALS)
 }
