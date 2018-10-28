@@ -67,8 +67,8 @@ if sys.version_info < (3, 4):
 
 __author__ = 'Klaus Alexander Seistrup <klaus@seistrup.dk>'
 __whoami__ = 'today'
-__revision__ = '2018-10-28'
-__version__ = '0.2.1 ({})'.format(__revision__)
+__revision__ = '2'
+__version__ = '2018.10.28-{rev}'.format(rev=__revision__)
 __copyright__ = """\
 today {}
 Copyright © 2010-18 Klaus Alexander Seistrup <klaus@seistrup.dk>
