@@ -64,12 +64,12 @@ __whoami__ = 'today'
 __revision__ = '3'
 __version__ = '2018.10.28-{rev}'.format(rev=__revision__)
 __copyright__ = """\
-today {}
+today {ver}
 Copyright © 2010-18 Klaus Alexander Seistrup <klaus@seistrup.dk>
 
 This is free software; see the source for copying conditions. There is no
 warranty; not even for merchantability or fitness for a particular purpose.\
-""".format(__version__)
+""".format(ver=__version__)
 
 DEBUG = os.environ.get('DEBUG', 'False')[0].upper() in '1JTY'  # 1/Ja/True/Yes
 EPILOG = """
