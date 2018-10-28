@@ -129,15 +129,22 @@ ORDS = (
     '4th',
     '5th'
 )
+
+
+def keyword(word):
+    """Make a case-insensitive abbreviation of WORD"""
+    return word[:3].casefold()
+
+
 ORD_DICT = {
-    _val[:3].casefold(): _key for (_key, _val) in enumerate(ORDINALS)
+    keyword(_val): _key for (_key, _val) in enumerate(ORDINALS)
 }
 SUGAR = {
-    _val[:3].casefold(): _key for (_key, _val) in enumerate(ORDS)
+    keyword(_val): _key for (_key, _val) in enumerate(ORDS)
 }
 ORD_DICT.update(SUGAR)
 SUGAR = {
-    _val[:3].casefold(): _key for (_key, _val) in enumerate('\012345')
+    keyword(_val): _key for (_key, _val) in enumerate('\012345')
 }
 ORD_DICT.update(SUGAR)
 ORD_SET = set(ORD_DICT.keys())
@@ -148,7 +155,7 @@ WEEKS = (
     (1, 7), (8, 14), (15, 21), (22, 28), (29, 31)
 )
 
-IGNORE = {'a', 'is', 'no', 'num', 'occ', 'of', 'or', 'the'}
+IGNORE = {keyword(w) for w in 'a|is|number|occurrence|of|or|the'.split('|')}
 
 
 def debug(head, data=None):
@@ -229,7 +236,7 @@ def today(exprs, utc=False, verbose=False):
     windex = None
 
     for word in exprs:
-        abbr = word[:3].casefold()
+        abbr = keyword(word)
         if abbr in IGNORE:
             continue
         if abbr in DOW_SET:
