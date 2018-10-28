@@ -163,41 +163,12 @@ def debug(head, data=None):
         pprint(head if data is None else {head: data}, stream=STDERR)
 
 
-def deuglify(error):
-    """Deuglify the EnvironmentError class of errors"""
-    debug('ugly', error)
-
-    if not isinstance(error, Exception):
-        return error
-
-    nargs = len(error.args)
-
-    if nargs == 1:
-        return str(error)
-
-    strerr = getattr(error, 'strerror', None)
-
-    if nargs == 2 and strerr is not None:
-        fname1 = getattr(error, 'filename', None)
-        fname2 = getattr(error, 'filename2', None)
-
-        if fname1 and fname2:
-            return '{}: {} → {}'.format(strerr, fname1, fname2)
-        if fname1 or fname2:
-            return '{}: {}'.format(strerr, fname1 or fname2)
-
-        return strerr
-
-    # Let's not pretend that we know the nature of the exception
-    return error
-
-
 def die(error=None):
     """Exit gracefully"""
     debug('exit', error)
 
     if error:
-        print(deuglify(error), file=STDERR)
+        print(error, file=STDERR)
 
     sys.exit(1 if error else 0)
 
