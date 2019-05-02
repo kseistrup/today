@@ -12,10 +12,11 @@ positional arguments:
 
 optional arguments:
   -h, --help       show this help message and exit
-  -v, --version    show version information and exit
+  -V, --version    show version information and exit
   -c, --copyright  show copying policy and exit
   -u, -z, --utc    use UTC rather than local time
   -q, --quiet      don't say a thing unless it's an error
+  -v, --verbose    show result
 
 This program tests if a set of conditions is true for today,
 and exits accordingly.

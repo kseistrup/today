@@ -8,11 +8,12 @@ positional arguments:
 
 optional arguments:
   -h, --help       show this help message and exit
-  -v, --version    show version information and exit
+  -V, --version    show version information and exit
   -c, --copyright  show copying policy and exit
 or:
   -u, -z, --utc    use UTC rather than local time
   -q, --quiet      don't say a thing unless it's an error
+  -v, --verbose    show result
 
 This program tests if a set of conditions is true for today,
 and exits accordingly.
@@ -61,11 +62,11 @@ if sys.version_info < (3, 4):
 
 __author__ = 'Klaus Alexander Seistrup <klaus@seistrup.dk>'
 __whoami__ = 'today'
-__revision__ = '5'
-__version__ = '2018.10.28-{rev}'.format(rev=__revision__)
+__revision__ = '1'
+__version__ = '2019.5.2-{rev}'.format(rev=__revision__)
 __copyright__ = """\
 today {ver}
-Copyright © 2010-18 Klaus Alexander Seistrup <klaus@seistrup.dk>
+Copyright © 2010−19 Klaus Alexander Seistrup <klaus@seistrup.dk>
 
 This is free software; see the source for copying conditions. There is no
 warranty; not even for merchantability or fitness for a particular purpose.\
@@ -269,7 +270,7 @@ def main(progname=__whoami__):
         epilog=EPILOG
     )
     # Generic arguments
-    parser.add_argument('-v', '--version', action='version',
+    parser.add_argument('-V', '--version', action='version',
                         version='%(prog)s/{}'.format(__version__),
                         help='show version information and exit')
     parser.add_argument('-c', '--copyright', action='version',
@@ -278,8 +279,13 @@ def main(progname=__whoami__):
     # Specific arguments
     parser.add_argument('-u', '-z', '--utc', action='store_true',
                         help='use UTC rather than local time')
-    parser.add_argument('-q', '--quiet', action='store_true',
+    # Mutually exclusive arguments
+    pgroup = parser.add_mutually_exclusive_group()
+    pgroup.add_argument('-q', '--quiet', action='store_true', default=True,
                         help="don't say a thing unless it's an error")
+    pgroup.add_argument('-v', '--verbose', action='store_true', default=False,
+                        help='display result')
+    # The rest
     parser.add_argument('CONDITION', nargs='+', help='please see epilog')
 
     args = parser.parse_args()
@@ -288,7 +294,7 @@ def main(progname=__whoami__):
     today(
         [cond.strip(string.punctuation) for cond in args.CONDITION],
         args.utc,
-        not args.quiet
+        args.verbose or not args.quiet
     )
     return 0
 
