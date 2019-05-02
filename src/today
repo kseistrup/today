@@ -62,7 +62,7 @@ if sys.version_info < (3, 4):
 
 __author__ = 'Klaus Alexander Seistrup <klaus@seistrup.dk>'
 __whoami__ = 'today'
-__revision__ = '1'
+__revision__ = '2'
 __version__ = '2019.5.2-{rev}'.format(rev=__revision__)
 __copyright__ = """\
 today {ver}
@@ -97,8 +97,10 @@ or even just 1, 2, 3, 4, or 5.
 
 (STDIN, STDOUT, STDERR) = (sys.stdin, sys.stdout, sys.stderr)
 
+SENTINEL = '\0'
+
 WEEKDAYS = (
-    '\0',  # This index in 1-based
+    SENTINEL,  # This index in 1-based
     'Monday',
     'Tuesday',
     'Wednesday',
@@ -117,10 +119,10 @@ def keyword(word):
 DOW_LIST = [keyword(_dow) for _dow in WEEKDAYS]
 DOW_BITS = {_val: 1 << _key for (_key, _val) in enumerate(DOW_LIST)}
 DOW_SET = set(DOW_LIST)
-DOW_SET.discard('\0')
+DOW_SET.discard(SENTINEL)
 
 ORDINALS = (
-    '\0',  # This index is 1-based
+    SENTINEL,  # This index is 1-based
     'first',
     'second',
     'third',
@@ -129,7 +131,7 @@ ORDINALS = (
     'last'
 )
 ORDS = (
-    '\0',  # This index in 1-based
+    SENTINEL,  # This index in 1-based
     '1st',
     '2nd',
     '3rd',
@@ -148,7 +150,7 @@ SUGAR = {
 }
 ORD_DICT.update(SUGAR)
 ORD_SET = set(ORD_DICT.keys())
-ORD_SET.discard('\0')
+ORD_SET.discard(SENTINEL)
 
 WEEKS = (
     (0, 0),  # This index is 1-based
