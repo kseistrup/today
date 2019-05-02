@@ -62,7 +62,7 @@ if sys.version_info < (3, 4):
 
 __author__ = 'Klaus Alexander Seistrup <klaus@seistrup.dk>'
 __whoami__ = 'today'
-__revision__ = '2'
+__revision__ = '3'
 __version__ = '2019.5.2-{rev}'.format(rev=__revision__)
 __copyright__ = """\
 today {ver}
@@ -286,7 +286,7 @@ def main(progname=__whoami__):
     pgroup.add_argument('-q', '--quiet', action='store_true', default=True,
                         help="don't say a thing unless it's an error")
     pgroup.add_argument('-v', '--verbose', action='store_true', default=False,
-                        help='display result')
+                        help='show result')
     # The rest
     parser.add_argument('CONDITION', nargs='+', help='please see epilog')
 
